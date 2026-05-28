@@ -55,10 +55,10 @@ Before any significant task, show me 2-3 ways you could approach this work. Wait
 If you are uncertain about any fact, statistic, date, or piece of technical information: say so explicitly before including it.
 
 **Who I am and what I know:**
-* **About me:** Taiwo
-* **Role:** AI Engineer & Senior Data Analyst
-* **Background in:** Computer Science (MS in AI/ML).
-* **Strong in:** RAG pipelines, LLM fine-tuning (Llama-3), AWS serverless architectures, data visualization.
+* **About me:** [YOUR_NAME]
+* **Role:** [YOUR_ROLE — e.g. Senior Backend Engineer, AI Engineer]
+* **Background in:** [YOUR_BACKGROUND — e.g. Computer Science, 5 years Python]
+* **Strong in:** [YOUR_STRENGTHS — e.g. REST APIs, PostgreSQL, Docker]
 * **Instruction:** Adjust the depth of every response to match this. Never over-explain what I already know. Never skip context I need.
 
 **Current project context:**
@@ -68,10 +68,10 @@ If you are uncertain about any fact, statistic, date, or piece of technical info
 * **Rule:** Apply this context to every task. When something doesn't fit, flag it before proceeding.
 
 **Lock your tech stack:**
-* **Cloud Infrastructure:** AWS (Serverless) - Lambda, Bedrock, Glue, Amplify
-* **AI/Models:** Llama-3, GPT4All
-* **Document Parsing:** LlamaParse, Docling
-* **Data Visualization/BI:** Power BI, Tableau
+* [YOUR_STACK — e.g. Cloud: AWS Lambda / GCP Cloud Run]
+* [YOUR_STACK — e.g. Language: Python 3.11 / TypeScript]
+* [YOUR_STACK — e.g. Framework: FastAPI / Next.js]
+* [YOUR_STACK — e.g. DB: PostgreSQL / Redis]
 
 ---
 
@@ -217,12 +217,12 @@ async def first_run(project_path: Path, claude_dir: Path, claude_md: Path) -> st
     # 2. Create .claude/ directory
     claude_dir.mkdir(exist_ok=True)
     (claude_dir / "mvp").mkdir(exist_ok=True)
-    steps.append("✅ Created .claude/ directory")
+    steps.append("Created .claude/ directory")
 
     # 3. Write settings.json
     try:
         write_settings_json(claude_dir)
-        steps.append("✅ Wrote .claude/settings.json (scoped auto-mode)")
+        steps.append("Wrote .claude/settings.json (scoped auto-mode)")
     except Exception as e:
         errors.append(f"settings.json: {e}")
 
@@ -234,7 +234,7 @@ async def first_run(project_path: Path, claude_dir: Path, claude_md: Path) -> st
             PROJECT_FOCUS=project_focus,
         )
         claude_md.write_text(filled)
-        steps.append("✅ Wrote CLAUDE.md")
+        steps.append("Wrote CLAUDE.md")
     except Exception as e:
         errors.append(f"CLAUDE.md: {e}")
 
@@ -246,7 +246,7 @@ async def first_run(project_path: Path, claude_dir: Path, claude_md: Path) -> st
             memory_path.write_text(
                 MEMORY_TEMPLATE.format(PROJECT_NAME=project_name, DATE=now)
             )
-            steps.append("✅ Created MEMORY.md")
+            steps.append("Created MEMORY.md")
     except Exception as e:
         errors.append(f"MEMORY.md: {e}")
 
@@ -257,7 +257,7 @@ async def first_run(project_path: Path, claude_dir: Path, claude_md: Path) -> st
             errors_path.write_text(
                 ERRORS_TEMPLATE.format(PROJECT_NAME=project_name, DATE=now)
             )
-            steps.append("✅ Created ERRORS.md")
+            steps.append("Created ERRORS.md")
     except Exception as e:
         errors.append(f"ERRORS.md: {e}")
 
@@ -266,7 +266,7 @@ async def first_run(project_path: Path, claude_dir: Path, claude_md: Path) -> st
         append_global_memory(
             f"[{now}] New project initialized: {project_name} at {project_path}"
         )
-        steps.append("✅ Updated ~/.claude/MEMORY.md (global)")
+        steps.append("Updated ~/.claude/MEMORY.md (global)")
     except Exception as e:
         errors.append(f"global MEMORY.md: {e}")
 
@@ -277,11 +277,11 @@ async def first_run(project_path: Path, claude_dir: Path, claude_md: Path) -> st
             subprocess.run(
                 ["git", "init"], cwd=project_path, capture_output=True, check=True
             )
-            steps.append("✅ git init")
+            steps.append("git init")
         except Exception as e:
             errors.append(f"git init: {e}")
     else:
-        steps.append("ℹ️  Git repo already exists — skipped")
+        steps.append("Git repo already exists — skipped")
 
     # 9. Generate MVP structure
     if prd_content:
@@ -289,11 +289,11 @@ async def first_run(project_path: Path, claude_dir: Path, claude_md: Path) -> st
             mvp_result = generate_mvp_structure(
                 claude_dir / "mvp", prd_content, project_name
             )
-            steps.append(f"✅ Generated MVP structure: {mvp_result}")
+            steps.append(f"Generated MVP structure: {mvp_result}")
         except Exception as e:
             errors.append(f"MVP generation: {e}")
     else:
-        steps.append("⚠️  No PRD/implementation plan found — MVP structure skipped")
+        steps.append("No PRD/implementation plan found — MVP structure skipped")
         steps.append("   → Create a PRD.md or implementation_plan.md and re-run")
 
     # 10. Write .daddyshome marker
@@ -310,7 +310,7 @@ async def first_run(project_path: Path, claude_dir: Path, claude_md: Path) -> st
 
     # Build output
     setup_log = "\n".join(steps)
-    error_log = "\n".join(f"⚠️  {e}" for e in errors) if errors else "None"
+    error_log = "\n".join(f"{e}" for e in errors) if errors else "None"
 
     briefing = f"""
 🏠 Daddy's Home — FIRST RUN

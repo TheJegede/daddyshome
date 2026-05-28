@@ -8,3 +8,7 @@ dist/
 build/
 *.egg-info/
 .pytest_cache/
+
+# Personal version of server.py — keep local only
+# Rename server.template.py to server.py and fill in your details
+src/server.py
