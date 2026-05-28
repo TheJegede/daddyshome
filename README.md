@@ -2,52 +2,81 @@
 
 Claude Code MCP — one command to initialize or resume any project session.
 
+Type `daddyshome` in Claude Code. That's it.
+
+---
+
 ## What it does
 
-Say `daddyshome` (or `/daddyshome`) in Claude Code. That's it.
+**First run** (no `.claude/` or `CLAUDE.md` detected):
 
-**First run** scaffolds:
-- `.claude/settings.json` — scoped auto-mode (no confirmation for safe ops, confirmation for destructive/network)
-- `CLAUDE.md` — your rules template with project context auto-filled from codebase scan
-- `MEMORY.md` + `ERRORS.md` — decision and failure logs
-- `~/.claude/MEMORY.md` — global session history
-- `.git/` — if not already initialized
-- `.claude/mvp/` — MVP structure parsed from your PRD/implementation plan
+- Creates `.claude/settings.json` with scoped auto-mode
+- Writes `CLAUDE.md` with your rules and auto-filled project context
+- Creates `MEMORY.md` and `ERRORS.md` for decision and failure logging
+- Updates `~/.claude/MEMORY.md` global session history
+- Runs `git init` if no repo exists
+- Scans for your PRD or implementation plan and generates `.claude/mvp/` structure
+- Auto-activates caveman and grill-me skills
 
-**Returning run** prints a briefing:
-- Last session summary from `MEMORY.md`
-- MVP gate status (with soft warnings for incomplete gates)
-- Auto-activates caveman + grill-me skills
+**Returning run** (`.claude/` or `CLAUDE.md` already exists):
+
+- Reads last session from `MEMORY.md`
+- Checks MVP gate status and warns if gates are incomplete
+- Auto-activates skills
+- Prints a structured briefing so you pick up exactly where you left off
 
 ---
 
 ## Install
 
-```bash
-# 1. Install Python package
+### 1. Clone the repo
+
+```powershell
+git clone https://github.com/TheJegede/daddyshome
 cd daddyshome
-pip install -e .
-
-# 2. Add MCP server to Claude Code config
-# Edit ~/.claude/claude_desktop_config.json (or your Claude Code MCP settings):
 ```
 
-```json
-{
-  "mcpServers": {
-    "daddyshome": {
-      "command": "python",
-      "args": ["/absolute/path/to/daddyshome/src/server.py"],
-      "type": "stdio"
-    }
-  }
-}
+### 2. Set up your personal server.py
+
+```powershell
+copy src\server.template.py src\server.py
 ```
 
-```bash
-# 3. Install the skill
-# Copy skill/SKILL.md to your Claude skills directory:
-cp skill/SKILL.md /path/to/your/skills/daddyshome/SKILL.md
+Open `src\server.py` and fill in your details in the `CLAUDE_MD_TEMPLATE` section:
+
+```python
+* **About me:** [YOUR_NAME]
+* **Role:** [YOUR_ROLE]
+* **Background in:** [YOUR_BACKGROUND]
+* **Strong in:** [YOUR_STRENGTHS]
+```
+
+And your tech stack:
+
+```python
+* [YOUR_STACK — e.g. Cloud: AWS Lambda]
+* [YOUR_STACK — e.g. Language: Python 3.11]
+```
+
+### 3. Run the installer
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+The script will:
+- Install Python dependencies
+- Register the MCP server in your Claude Code config
+- Install the skill to `~/.claude/skills/daddyshome/`
+- Set up global `~/.claude/MEMORY.md`
+- Verify everything loaded correctly
+
+### 4. Restart Claude Code
+
+Full quit and reopen. Then open any project and type:
+
+```
+daddyshome
 ```
 
 ---
@@ -55,13 +84,39 @@ cp skill/SKILL.md /path/to/your/skills/daddyshome/SKILL.md
 ## Usage
 
 ```
-# In Claude Code terminal or chat:
 daddyshome
 daddy's home
 /daddyshome
 ```
 
-That's it.
+All three work.
+
+---
+
+## MVP task tracking
+
+daddyshome parses your PRD or implementation plan and scaffolds a gated MVP structure:
+
+```
+.claude/mvp/
+├── mvp-1/
+│   ├── tasks.md      # Claude tracks checkboxes here
+│   ├── status.json   # auto-updated on each run
+│   └── notes.md
+└── mvp-2/            # locked until mvp-1 complete
+    ├── tasks.md
+    ├── status.json
+    └── notes.md
+```
+
+Mark tasks done directly in `tasks.md`:
+
+```markdown
+- [x] Set up database schema
+- [ ] Build API layer
+```
+
+When all tasks in MVP N are checked, MVP N+1 unlocks automatically on the next `daddyshome` run.
 
 ---
 
@@ -70,35 +125,21 @@ That's it.
 ```
 your-project/
 ├── .claude/
-│   ├── settings.json       # scoped auto-mode config
-│   ├── .daddyshome         # marker file (first-run detection)
+│   ├── settings.json
+│   ├── .daddyshome
 │   └── mvp/
-│       ├── mvp-1/
-│       │   ├── tasks.md    # Claude tracks checkboxes here
-│       │   ├── status.json # auto-updated by daddyshome
-│       │   └── notes.md
-│       └── mvp-2/          # locked until mvp-1 complete
-│           ├── tasks.md
-│           ├── status.json
-│           └── notes.md
-├── CLAUDE.md               # your rules + project context
-├── MEMORY.md               # decision log
-└── ERRORS.md               # failure log
+├── CLAUDE.md
+├── MEMORY.md
+└── ERRORS.md
 ```
 
 ---
 
-## MVP task tracking
+## Requirements
 
-Claude tracks tasks by reading checkboxes in `.claude/mvp/mvp-{N}/tasks.md`.
-
-Mark tasks done:
-```markdown
-- [x] Set up LlamaParse integration   ← done
-- [ ] Connect Bedrock embedding model  ← open
-```
-
-When all tasks in MVP N are `[x]`, MVP N+1 unlocks automatically on next `daddyshome` run.
+- Windows (PowerShell installer)
+- Python 3.10+
+- Claude Code with MCP support
 
 ---
 
@@ -107,22 +148,14 @@ When all tasks in MVP N are `[x]`, MVP N+1 unlocks automatically on next `daddys
 ```
 daddyshome/
 ├── src/
-│   ├── server.py     # MCP server entry point
-│   ├── scanner.py    # codebase + PRD scanner
-│   ├── mvp.py        # MVP structure generator + status tracker
-│   ├── settings.py   # settings.json writer
-│   ├── memory.py     # MEMORY.md read/write
-│   └── briefing.py   # briefing helpers
+│   ├── server.template.py  # rename to server.py and fill in your details
+│   ├── scanner.py          # token-conscious codebase + PRD scanner
+│   ├── mvp.py              # MVP structure generator + status tracker
+│   ├── settings.py         # settings.json writer
+│   └── memory.py           # MEMORY.md read/write
 ├── skill/
-│   └── SKILL.md      # Claude skill wrapper
+│   └── SKILL.md            # Claude Code skill wrapper
+├── install.ps1             # Windows installer
 ├── pyproject.toml
 └── README.md
 ```
-
----
-
-## Requirements
-
-- Python 3.10+
-- `mcp>=1.0.0`
-- Claude Code with MCP support
