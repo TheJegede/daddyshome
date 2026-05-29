@@ -73,6 +73,14 @@ if (Test-Path "$TempExtract\SKILL.md") {
     Write-Fail "SKILL.md missing from zip"
 }
 
+# reference/ -> skill/reference/ (progressive-disclosure docs, loaded on demand)
+if (Test-Path "$TempExtract\reference") {
+    Copy-Item "$TempExtract\reference" "$InstallDir\skill\reference" -Recurse -Force
+    Write-OK "Placed skill\reference\"
+} else {
+    Write-Warn "reference\ not found in zip — SKILL.md links will be dead"
+}
+
 # Other root files
 foreach ($f in @("pyproject.toml", "README.md")) {
     if (Test-Path "$TempExtract\$f") {
@@ -181,6 +189,11 @@ if (-not (Test-Path $SkillsDir)) {
 
 Copy-Item -Path "$InstallDir\skill\SKILL.md" -Destination "$SkillsDir\SKILL.md" -Force
 Write-OK "Skill installed to $SkillsDir\SKILL.md"
+
+if (Test-Path "$InstallDir\skill\reference") {
+    Copy-Item -Path "$InstallDir\skill\reference" -Destination "$SkillsDir\reference" -Recurse -Force
+    Write-OK "Skill references installed to $SkillsDir\reference\"
+}
 
 # Step 9: Global MEMORY.md
 Write-Step "Setting up global MEMORY.md"
